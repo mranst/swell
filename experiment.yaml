@@ -1,0 +1,291 @@
+# What is the experiment id?
+experiment_id: swell-localensembleda
+
+# What is the experiment root (the directory where the experiment will be stored)?
+experiment_root: /discover/nobackup/manstett/SwellExperiments
+
+# What is the time of the first cycle (middle of the window)?
+start_cycle_point: '2021-12-12T00:00:00Z'
+
+# What is the time of the final cycle (middle of the window)?
+final_cycle_point: '2021-12-12T00:00:00Z'
+
+# List of models in this experiment
+model_components:
+- geos_ocean
+- geos_atmosphere
+
+# Since this suite is non-cycling choose how many hours the workflow can run ahead?
+runahead_limit: P4
+
+# Do you want to use an existing JEDI build or create a new build?
+jedi_build_method: use_existing
+
+# What is the path to the existing JEDI build directory?
+existing_jedi_build_directory: /discover/nobackup/projects/gmao/advda/swell/JediBundles/fv3_soca_SLES15/build-intel-release
+
+# What is the path to the existing JEDI source code directory?
+existing_jedi_source_directory: /discover/nobackup/projects/gmao/advda/swell/JediBundles/fv3_soca_SLES15
+
+# Configurations for the model components.
+models:
+
+  # Configuration for the geos_ocean model component.
+  geos_ocean:
+
+    # Enter the cycle times for this model.
+    cycle_times:
+    - T00
+    - T12
+
+    # Enter the ensemble hofx strategy.
+    ensemble_hofx_strategy: serial
+
+    # Enter if skip ensemble hofx.
+    skip_ensemble_hofx: true
+
+    # Enter the number of ensemble packets.
+    ensemble_hofx_packets: 1
+
+    # Enter the window type for this model.
+    window_type: 3D
+
+    # What is the duration from the middle of the window when forecasts start?
+    analysis_forecast_window_offset: -PT6H
+
+    # What are the analysis variables?
+    analysis_variables:
+    - socn
+    - tocn
+    - ssh
+    - hocn
+
+    # What is the name of the name of the experiment providing the backgrounds?
+    background_experiment: s2s
+
+    # How long before the middle of the analysis window did the background providing forecast begin?
+    background_time_offset: PT9H
+
+    # Provide a list of patterns that you wish to remove from the cycle directory.
+    clean_patterns:
+    - '*.nc4'
+    - '*.txt'
+    - '*MOM*'
+
+    # What is the horizontal resolution for the forecast model and backgrounds?
+    horizontal_resolution: 1440x1080
+
+    # What is the database providing the observations?
+    obs_experiment: s2s
+
+    # What is the group providing the observations?
+    obs_provider: odas
+
+    # Which observations do you want to include?
+    observations:
+    - adt
+    - insitus
+    - insitut
+
+    # What is the path to where ensemble members are stored?
+    path_to_ensemble: defer_to_model
+
+    # What is the number of processors for JEDI?
+    total_processors: 24
+
+    # What is the vertical resolution for the forecast model and background?
+    vertical_resolution: '75'
+
+    # What is the duration for the data assimilation window?
+    window_length: PT12H
+
+    # What is the duration between the middle of the window and the beginning?
+    window_offset: PT6H
+
+  # Configuration for the geos_atmosphere model component.
+  geos_atmosphere:
+
+    # Enter the cycle times for this model.
+    cycle_times:
+    - T00
+    - T06
+    - T12
+    - T18
+
+    # Enter the ensemble hofx strategy.
+    ensemble_hofx_strategy: parallel
+
+    # Enter if skip ensemble hofx.
+    skip_ensemble_hofx: true
+
+    # Enter the number of ensemble packets.
+    ensemble_hofx_packets: 2
+
+    # Enter the window type for this model.
+    window_type: 3D
+
+    # What is the duration from the middle of the window when forecasts start?
+    analysis_forecast_window_offset: -PT3H
+
+    # What are the analysis variables?
+    analysis_variables:
+    - ua
+    - va
+    - t
+    - q
+    - ps
+    - qi
+    - ql
+    - qr
+    - qs
+    - o3ppmv
+    - phis
+    - frocean
+    - frlake
+    - frseaice
+
+    # What is the name of the name of the experiment providing the backgrounds?
+    background_experiment: x0048
+
+    # How long before the middle of the analysis window did the background providing forecast begin?
+    background_time_offset: PT9H
+
+    # Provide a list of patterns that you wish to remove from the cycle directory.
+    clean_patterns:
+    - geos.mem*.nc4
+    - '*log*'
+    - '*.txt'
+
+    # What is the path to the CRTM coefficient files?
+    crtm_coeff_dir: /discover/nobackup/projects/gmao/advda/SwellStaticFiles/jedi/crtm_coefficients/2.4.1/
+
+    # Do you want to use cycling VarBC option?
+    cycling_varbc: false
+
+    # How many members comprise the ensemble?
+    ensemble_num_members: 2
+
+    # Calculate ensemble mean only?
+    ensmean_only: false
+
+    # Calculate ensemble mean and variance only?
+    ensmeanvariance_only: false
+
+    # Which GSIBEC climatological or hybrid?
+    gsibec_configuration: cli_gsibec_configuration
+
+    # What is the length scale for horizontal covariance localization?
+    horizontal_localization_lengthscale: 10000e3
+
+    # What is the maximum number of observations to consider for horizontal covariance localization?
+    horizontal_localization_max_nobs: 1000
+
+    # Which localization scheme should be applied in the horizontal?
+    horizontal_localization_method: Horizontal Gaspari-Cohn
+
+    # What is the horizontal resolution for the forecast model and backgrounds?
+    horizontal_resolution: 91
+
+    # Specify the multiplicative prior inflation coefficient (0, inf].
+    local_ensemble_inflation_mult: 1.1
+
+    # Specify the Relaxation To Prior Perturbation (RTPP) coefficient (0, 1].
+    local_ensemble_inflation_rtpp: 0.6
+
+    # Specify the Relaxation To Prior Spread (RTPS) coefficient (0, 1].
+    local_ensemble_inflation_rtps: 0.5
+
+    # Save the posterior ensemble members?
+    local_ensemble_save_posterior_ensemble: true
+
+    # Save the posterior ensemble member increments?
+    local_ensemble_save_posterior_ensemble_increments: true
+
+    # Save the posterior ensemble mean?
+    local_ensemble_save_posterior_mean: false
+
+    # Save the posterior ensemble mean increment?
+    local_ensemble_save_posterior_mean_increment: true
+
+    # Which local ensemble solver type should be implemented?
+    local_ensemble_solver: GETKF
+
+    # Which local ensemble solver type should be implemented?
+    local_ensemble_use_linear_observer: true
+
+    # What number of processors do you wish to use in the x-direction?
+    npx_proc: 2
+
+    # What number of processors do you wish to use in the y-direction?
+    npy_proc: 2
+
+    # What is the database providing the observations?
+    obs_experiment: x0048v2
+
+    # What is the group providing the observations?
+    obs_provider: ncdiag
+
+    # Which observations do you want to include?
+    observations:
+    - sondes
+    - amsua_metop-b
+
+    # What is the path to the GSI formatted observing system records?
+    observing_system_records_mksi_path: None
+
+    # What is the GSI formatted observing system records tag?
+    observing_system_records_mksi_path_tag: None
+
+    # What is the path to the Swell formatted observing system records?
+    observing_system_records_path: None
+
+    # What is the path to where ensemble members are stored?
+    path_to_ensemble: /discover/nobackup/projects/gmao/advda/SwellTestData/letk/ensemble/91/Y%Y/M%m/D%d/H%H/geos*%Y%m%d_%H%M%Sz.nc4
+
+    # Should a log (base 10) transformation be applied to vertical coordinate when constructing vertical localization?
+    vertical_localization_apply_log_transform: true
+
+    # Which localization scheme should be applied in the vertical?
+    vertical_localization_function: Gaspari Cohn
+
+    # Which coordinate should be used in constructing vertical localization?
+    vertical_localization_ioda_vertical_coord: pressure
+
+    # Which vertical coordinate group should be used in constructing vertical localization?
+    vertical_localization_ioda_vertical_coord_group: MetaData
+
+    # What is the length scale for vertical covariance localization?
+    vertical_localization_lengthscale: 4
+
+    # What localization scheme should be applied in constructing a vertical localization?
+    vertical_localization_method: Vertical localization
+
+    # What is the vertical resolution for the forecast model and background?
+    vertical_resolution: '72'
+
+    # What is the duration for the data assimilation window?
+    window_length: PT6H
+
+    # What is the duration between the middle of the window and the beginning?
+    window_offset: PT3H
+
+# Generate JEDI executable YAML and exit?
+generate_yaml_and_exit: false
+
+# What is the path to the R2D2 local directory?
+r2d2_local_path: /discover/nobackup/manstett/R2D2DataStore/Local
+
+# What is the path to the Swell Static files directory?
+swell_static_files: /discover/nobackup/projects/gmao/advda/SwellStaticFiles
+
+# What is the path to the user provided Swell Static Files directory?
+swell_static_files_user: None
+
+# Datetime this file was created (auto added)
+datetime_created: 20241119_114044Z
+
+# Computing platform to run the experiment
+platform: nccs_discover_sles15
+
+# Record of the suite being executed
+suite_to_run: localensembleda

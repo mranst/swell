@@ -785,6 +785,7 @@ path_to_ensemble:
   ask_question: true
   default_value: defer_to_model
   models:
+  - geos_ocean
   - geos_atmosphere
   prompt: What is the path to where ensemble members are stored?
   tasks:
