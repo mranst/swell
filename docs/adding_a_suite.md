@@ -16,11 +16,11 @@ This document provides a high-level overview of the structure of a Swell suite, 
 
 # Broad Overview of Experiments
 
-The two most basic parts to an experiment are the `experiment.yaml` config, and the `flow.cylc` workflow file. Examples of each follow. Workflows and configs for existing suites are a good source of more detailed examples.
+The two most basic parts to an experiment are the `experiment.yaml` config, and the `flow.cylc` workflow file. Examples of each follow. Workflows and configs for existing suites are also a good source of more detailed examples.
 
 ## Example Experiment Config
 
-`experiment.yaml` sets values for parameters used in the code. This is example snippet from the Swell suite `3dvar`:
+`experiment.yaml` sets values for parameters used in the code. This is an example snippet from the Swell suite `3dvar`:
 
 ```yaml
 # What is the experiment id?
@@ -122,7 +122,7 @@ The actions associated with these tasks is defined in the `runtime` section of `
 
 ``` 
 
-The `root` section defines actions and variables shared by all tasks. Here, `BuildJedi` has more complex cylc options than the other tasks.
+The `root` section defines actions and variables shared by all tasks. Note that `BuildJedi` has more complex cylc options than the other tasks.
 
 ## How the experiment is created
 
@@ -130,10 +130,10 @@ When an experiment is created using `swell create <suite>`, a dictionary of ques
 
 # Creating a Suite
 
-There are multiple steps and things to account when for creating a suite for Swell. This is a abstract overview of the basic steps to consider when implementing a suite. Some suites will likely require more advanced consideration than what is described here.
+There are multiple steps and things to account when for creating a suite for Swell. This is a crude overview of the basic steps to consider when implementing a suite. Some suites will likely require more advanced consideration than what is described here.
 
-In abstract, these are the steps towards designing swell workflows
-1. Envision a set of tasks that need to be done.
+In abstract, these are the steps towards designing swell workflows:
+1. Envision a set of tasks that need to be done:
 - Tasks should be thought of as a unit of work comprising a complete step in the process. 
 - Ideally, unneeded redundancy should be minimized, with an eye towards modularity.
 - If practical, consider generalizing tasks to be used in multiple contexts.
@@ -187,11 +187,11 @@ class CloneGeosMksi(taskBase):
 ```
 This example shows the basics of writing a task, including task definition and the execute function. The current model is accessed by the `self.get_model()` function, inherited from `taskBase`. The variables `path_to_geos_mksi`, and `tag`, are pulled from the experiment configuration, which is sourced from the `experiment.yaml`.
 
-For debugging purposes, it may be easier to first create and test tasks outside of the Swell context, and then "translate" them to Swell by changing relevant variables and path specifications. Alternatively, `experiment.yaml` can be populated manually and tested using `swell task <task> experiment.yaml`.
+For debugging purposes, it may be easier to first create and test some tasks outside of Swell, and then port them to Swell by changing relevant variables and path specifications. Alternatively, `experiment.yaml` can be populated manually and tested using `swell task <task> experiment.yaml`.
 
 ### Creating the flow.cylc template
 
-For more detailed information on cylc workflows, see the cylc documentation (), existing Swell suite workflows can also provide useful examples to consider. 
+For more detailed information on cylc workflows, see the [cylc documentation](https://cylc.github.io/cylc-doc/latest/html/index.html). Existing Swell suite workflows can also provide useful examples to consider. 
 
 Suite workflows are stored in `src/swell/suites/<suite>`.
 
@@ -214,6 +214,8 @@ The experiment `flow.cylc` file is generated from a suite template using a `jinj
 
 For initial development/testing purposes, it may be easier to create a `flow.cylc` using hard-coded values, then replace these with `jinja2` templated values as the suite nears completion.
 
+## Suite and task questions
+
 ### Question Objects
 
 Questions for swell are stored as dataclass instances, in the file `src/swell/utilities/question_defaults.py`. Dataclasses allow for simple declaration of data fields, and powerful type checking capabilities. Each question is an extension of the `SuiteQuestion` or `TaskQuestion` class, which are extensions of the `SwellQuestion` parent:
@@ -232,7 +234,8 @@ class SwellQuestion:
     ask_question: bool = False
     options: Optional[str] = None
 ```
-
+Arguments:
+- default_value: default value for the answer
 - question_name: name of the question (should usually match the class).
 - widget_type: A custom enum specifying the data type of the answer, as well as the way the question will be asked on the command line interface. Options include drop lists, check lists, and direct entry.
 - prompt: A sentence or two describing the question.
@@ -289,11 +292,11 @@ Task question lists are stored in `src/swell/tasks/task_questions.py`
     )
 ```
 
-During experiment creation, Swell scans the suite's `flow.cylc` file to find all of the tasks used in the workflow. It then finds the corresponding task lists in `src/swell/tasks/task_questions.py`, and fits together a list of uniquely named questions from all of the lists. Questions have a priority depending on order. In the case of duplicate questions, those further DOWN the list take priority. For this reason, it is NOT RECOMMENDED to set different default values for tasks in `task_questions.py`, since questions may be overridden by a questions in a different task. 
+During experiment creation, Swell scans the suite's `flow.cylc` file to find all of the tasks used in the workflow. It then finds the corresponding task lists in `src/swell/tasks/task_questions.py`, and fits together a list of uniquely named questions from all of the lists. Questions have a priority depending on order. In the case of duplicate questions, those further DOWN the list take priority. For this reason, it is NOT RECOMMENDED to set different default values for tasks in `task_questions.py`, since questions may be overridden by a questions in a different task. For ease of use, model-dependent questions can be assigned directly in their respective lists.
 
 In this question infrastructure, suites priority over tasks. Any question specified in a suite configuration will override the default value for a question in one of its member tasks. This allows for easily setting different configurations for suites without having to specify redundant questions.
 
-Consider the following example of suite questions for `3dvar`:
+Consider the following example of suite questions for `3dvar` (in python, variable names cannot begin with digits):
 
 ```python
 class SuiteQuestions(QuestionContainer, Enum):
@@ -389,4 +392,4 @@ class SuiteConfig(QuestionContainer, Enum):
 ```
 The class `SuiteQuestions` contains lists of questions which are common to many suites. This avoids the need for redundantly setting the same questions for every suite. 
 
-`\_3dvar_base` is responsible for establishing the baseline for questions used by the suite. The 'base' list should be used to associate all questions used by the suite. This list will be populated with the questions that match the defaults in `QuestionDefaults` (`src/swell/utilities/question_defaults.py`). However, in many cases, those defaults will not be ideal defaults for the individual suite. Thus, `\_3dvar_tier1` sets different default values which override the question defaults. If desired, other configurations can then inherit question defaults from `\_3dvar_tier1`, and set their own defaults on top of the existing ones.
+`_3dvar_base` is responsible for establishing the baseline for questions used by the suite. The 'base' list should be used to associate all questions used by the suite. This list will be populated with the questions that match the defaults in `QuestionDefaults` (`src/swell/utilities/question_defaults.py`). However, in many cases, those defaults will not be ideal defaults for the individual suite. Thus, `_3dvar_tier1` sets different default values which override the question defaults. If desired, other configurations can then inherit question defaults from `_3dvar_tier1`, and set their own defaults on top of the existing ones. 
