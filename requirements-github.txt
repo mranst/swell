@@ -8,4 +8,4 @@ isodate==0.6.1
 f90nml==1.4.4
 questionary==1.10.0
 flake8==6.0.0
-netCDF4<2
+netCDF4
