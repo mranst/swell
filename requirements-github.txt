@@ -9,4 +9,5 @@ f90nml>=1.4.3
 questionary>=1.10.0
 h5py>=3.7.0
 flake8==6.1.0
+wcwidth<0.2.13
 netCDF4>1.7
